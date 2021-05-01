@@ -32,7 +32,6 @@ jobs:
       run: |
         mkdir ${{ github.workspace }}/package
         cd src
-        dotnet nuget add source https://nuget.pkg.github.com/PlayCade/index.json -u hevey -n github -p ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text
         dotnet build --configuration Release --version-suffix CI-${{ env.version_suffix }} --output ${{ github.workspace }}/package
     - name: Upload Common Library CI Build
       uses: actions/upload-artifact@v1
