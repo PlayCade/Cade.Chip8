@@ -2,9 +2,9 @@
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using Cade.Chip8.Exceptions;
+using PlayCade.Chip8.Exceptions;
 
-namespace Cade.Chip8.Core
+namespace PlayCade.Chip8.Core
 {
     public class CoreManager
     {

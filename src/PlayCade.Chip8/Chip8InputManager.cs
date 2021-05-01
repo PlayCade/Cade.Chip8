@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Cade.Common.Interfaces;
 using Cade.Common.Models;
 
-namespace Cade.Chip8
+namespace PlayCade.Chip8
 {
     public sealed class Chip8InputManager : ICadeInputManager
     {

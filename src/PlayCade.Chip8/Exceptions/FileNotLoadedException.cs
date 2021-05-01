@@ -1,6 +1,6 @@
 using System;
 
-namespace Cade.Chip8.Exceptions
+namespace PlayCade.Chip8.Exceptions
 {
     public class FileNotLoadedException : Exception
     {

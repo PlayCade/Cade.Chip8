@@ -5,6 +5,8 @@
         <LangVersion>default</LangVersion>
         <Nullable>enable</Nullable>
         <TargetFrameworks>net5.0;netstandard2.0</TargetFrameworks>
+        <AssemblyName>PlayCade.Chip8</AssemblyName>
+        <RootNamespace>PlayCade.Chip8</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>

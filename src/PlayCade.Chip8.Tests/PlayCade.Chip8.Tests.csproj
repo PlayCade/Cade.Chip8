@@ -20,7 +20,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Cade.Chip8\Cade.Chip8.csproj" />
+      <ProjectReference Include="..\PlayCade.Chip8\PlayCade.Chip8.csproj" />
     </ItemGroup>
 
 </Project>

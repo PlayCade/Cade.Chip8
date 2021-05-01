@@ -3,9 +3,9 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Cade.Common.Interfaces;
-using Cade.Chip8.Core;
+using PlayCade.Chip8.Core;
 
-namespace Cade.Chip8
+namespace PlayCade.Chip8
 {
     public class Chip8Extension : ICadeExtension
     {
