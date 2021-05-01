@@ -11,8 +11,22 @@ on:
       - develop
 
 jobs:
+  Test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '5.0.x'
+    - name: Run Tests
+      run: |
+        cd src
+        dotnet nuget add source https://nuget.pkg.github.com/PlayCade/index.json -u hevey -n github -p ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text
+        dotnet test
   Build:
     runs-on: ubuntu-latest
+    needs: Test
     steps:
     - name: Set Environment Variables
       run: |
@@ -22,16 +36,11 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: '5.0.x'
-    - name: Test Chip8
-      run: |
-        cd src
-        dotnet nuget add source https://nuget.pkg.github.com/PlayCade/index.json -u hevey -n github -p ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text
-        dotnet test
-    - name: Build Common Library
-      if: success()
+    - name: Build Chip8 Library
       run: |
         mkdir ${{ github.workspace }}/package
         cd src
+        dotnet nuget add source https://nuget.pkg.github.com/PlayCade/index.json -u hevey -n github -p ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text
         dotnet build --configuration Release --version-suffix CI-${{ env.version_suffix }} --output ${{ github.workspace }}/package
     - name: Upload Common Library CI Build
       uses: actions/upload-artifact@v1
