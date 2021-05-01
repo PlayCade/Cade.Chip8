@@ -1,8 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>netstandard2.0;net5.0;net5.0-macos</TargetFrameworks>
         <Company>Cade</Company>
+        <LangVersion>default</LangVersion>
+        <Nullable>enable</Nullable>
+        <TargetFrameworks>net5.0;netstandard2.0</TargetFrameworks>
     </PropertyGroup>
 
     <ItemGroup>
