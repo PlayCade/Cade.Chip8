@@ -24,6 +24,7 @@ jobs:
         dotnet-version: '5.0.x'
     - name: Test Chip8
       run: |
+        cd src
         dotnet test
     - name: Build Common Library
       run: |
