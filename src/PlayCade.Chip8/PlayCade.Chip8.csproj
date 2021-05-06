@@ -5,10 +5,10 @@
         <LangVersion>default</LangVersion>
         <Nullable>enable</Nullable>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <TargetFrameworks>net5.0;netstandard2.0</TargetFrameworks>
         <AssemblyName>PlayCade.Chip8</AssemblyName>
         <RootNamespace>PlayCade.Chip8</RootNamespace>
         <RepositoryUrl>https://github.com/PlayCade/Chip8</RepositoryUrl>
+        <TargetFramework>netstandard2.1</TargetFramework>
     </PropertyGroup>
 
     <ItemGroup>
