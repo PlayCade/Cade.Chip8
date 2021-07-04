@@ -11,7 +11,7 @@ namespace PlayCade.Chip8.Core
         private const ushort MemorySize = 4096;
         private const ushort RegisterSize = 16;
 
-        public byte[] Keys = new byte[16];
+        public byte[]? Keys = new byte[16];
         public readonly byte[] Graphics = new byte[64 * 32];
 
         public byte SoundTimer;

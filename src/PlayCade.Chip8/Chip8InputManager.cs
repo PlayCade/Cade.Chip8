@@ -5,11 +5,11 @@ using Cade.Common.Models;
 
 namespace PlayCade.Chip8
 {
-    public sealed class Chip8InputManager : ICadeInputManager
+    public class Chip8InputManager : CadeInputManager
     {
         private readonly byte[] _keys = new byte[16];
         
-        private static Lazy<List<Input>> _lazy = new Lazy<List<Input>>(() => new List<Input>
+        private static Lazy<List<Input>> _lazy = new(() => new List<Input>
         {
             new Input
                 {
@@ -141,21 +141,21 @@ namespace PlayCade.Chip8
                 }
         });
 
-        public List<Input> Inputs()
+        public override List<Input> Inputs()
         {
             return _lazy.Value;
         }
 
-        public void Update(List<Input> inputs)
+        public override void Update(List<Input> inputs)
         {
             _lazy = new Lazy<List<Input>>(() => inputs);
         }
 
-        int ICadeInputManager.MaxPlayers()
+        public override int MaxPlayers()
         {
             return 1;
         }
-
+        
         public byte[] CheckKeys()
         {
             var inputs = _lazy.Value;

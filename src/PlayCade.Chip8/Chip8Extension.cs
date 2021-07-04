@@ -1,78 +1,88 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Cade.Common.Interfaces;
 using PlayCade.Chip8.Core;
+using Veldrid;
+using Veldrid.Sdl2;
+using Veldrid.StartupUtilities;
 
 namespace PlayCade.Chip8
 {
-    public class Chip8Extension : ICadeExtension
+    public class Chip8Extension : CadeExtension
     {
-        private CoreManager _core;
+        public readonly CoreManager _core;
         private const int UpdatesPerSecond = 25;
         private const int WaitTicks = 1000 / UpdatesPerSecond;
-        private const int MaxFrameskip = 5;
+        private const int MaxFrameSkip = 5;
         private const int MaxUpdatesPerSecond = 60;
         private const int MinWaitTicks = 1000 / MaxUpdatesPerSecond;
-        private bool _isRunning;
-        private readonly Chip8InputManager _inputManager = new Chip8InputManager();
-        
-        public void Load(string path)
+        private CancellationTokenSource _tokenSource;
+
+        public override void Load(string path)
         {
             var game = File.ReadAllBytes(path);
-            _core = new CoreManager();
             _core.Load(game);
         }
+        
 
-        public async void Run()
+        public override void Run()
         {
-            await Task.Run(() =>
+
+            var token = _tokenSource.Token;
+
+            Task.Run(() =>
             {
                 long nextUpdate = Environment.TickCount;
                 long lastUpdate = Environment.TickCount;
+            
+                Load("/Users/hevey/Downloads/chip8-master/roms/IBM Logo.ch8");
+                
 
-                _isRunning = true;
-
-                while (_isRunning)
+                var outputManager = OutputManager as Chip8OutputManager;
+                
+                while (!token.IsCancellationRequested)
                 {
-                    while (Environment.TickCount < lastUpdate + MinWaitTicks)
-                    {
-                        Thread.Sleep(0);
-                    }
-
+                    
                     lastUpdate = Environment.TickCount;
                     var framesSkipped = 0;
-                    while (Environment.TickCount > nextUpdate && framesSkipped < MaxFrameskip)
+                    while (Environment.TickCount > nextUpdate && framesSkipped < MaxFrameSkip)
                     {
-                        _core.Keys = _inputManager.CheckKeys();
+                        var inputManager = InputManager as Chip8InputManager;
+                        _core.Keys = inputManager?.CheckKeys();
                         _core.EmulateCycle();
                         // UPDATE HERE
                         nextUpdate += WaitTicks;
                         framesSkipped++;
                     }
-
-                    // Calculate interpolation for smooth animation between states:
-                    //var interpolation = ((float)Environment.TickCount + _waitTicks - nextUpdate) / _waitTicks;
-
-                    // Render-events:
-                    // repaint(interpolation);
+                    
+                    outputManager!.Graphics = _core.Graphics;
+                    if(_core.DrawFlag)
+                        outputManager.Draw();
+                    _core.DrawFlag = false;
                 }
-            });
+                
+            }, token);
         }
 
-        public string CoreName { get; }
-        public string CoreDescription { get; }
-        public string CoreDeveloper { get; }
-        public string PlatformName { get; }
-        public string PlatformDescription { get; }
-        public string PlatformDeveloper { get; }
-        public int MaxPlayers { get; }
-        public DateTime ReleaseDate { get; }
-        public string[] SupportedFileExtensions { get; }
+        public override string CoreName { get; }
+        public override string CoreDescription { get; }
+        public override string CoreDeveloper { get; }
+        public override string PlatformName { get; }
+        public override string PlatformDescription { get; }
+        public override string PlatformDeveloper { get; }
+        public override int MaxPlayers { get; }
+        public override DateTime ReleaseDate { get; }
+        public override string[] SupportedFileExtensions { get; }
 
-        public Chip8Extension()
+
+        public Chip8Extension(GraphicsDevice graphicsDevice, CancellationTokenSource tokenSource) : base(new Chip8InputManager(), new Chip8OutputManager(graphicsDevice))
         {
+            _core = new CoreManager();
+            _tokenSource = tokenSource;
+
             CoreName = "Chip8";
             CoreDescription = "CHIP-8 Extension for the Cade Arcade System";
             CoreDeveloper = "Cade";
