@@ -37,9 +37,7 @@ namespace PlayCade.Chip8
             {
                 long nextUpdate = Environment.TickCount;
                 long lastUpdate = Environment.TickCount;
-            
-                Load("/Users/hevey/Downloads/chip8-master/roms/IBM Logo.ch8");
-                
+
 
                 var outputManager = OutputManager as Chip8OutputManager;
                 
