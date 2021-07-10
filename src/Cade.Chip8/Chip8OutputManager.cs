@@ -9,7 +9,7 @@ using Cade.Common.Interfaces;
 using Veldrid;
 using Veldrid.SPIRV;
 
-namespace PlayCade.Chip8
+namespace Cade.Chip8
 {
     public class Chip8OutputManager : CadeOutputManager
     {
@@ -28,8 +28,8 @@ namespace PlayCade.Chip8
         }
         public (byte[] FragementShader, byte[] VertexShader) GetShaders()
         {
-            var fragmentShader = "PlayCade.Chip8.Shaders.fragment.glsl";
-            var vertexShader = "PlayCade.Chip8.Shaders.vertex.glsl";
+            var fragmentShader = "Cade.Chip8.Shaders.fragment.glsl";
+            var vertexShader = "Cade.Chip8.Shaders.vertex.glsl";
             
             var assembly = Assembly.GetExecutingAssembly();
             var fragmentStream = assembly.GetManifestResourceStream(fragmentShader);

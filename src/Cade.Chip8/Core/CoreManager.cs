@@ -2,9 +2,9 @@
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using PlayCade.Chip8.Exceptions;
+using Cade.Chip8.Exceptions;
 
-namespace PlayCade.Chip8.Core
+namespace Cade.Chip8.Core
 {
     public class CoreManager
     {
@@ -119,28 +119,25 @@ namespace PlayCade.Chip8.Core
             {
                 throw new FileNotLoadedException();
             }
-            
-            if (_task == null)
+
+            _cts = cts;
+            CancellationToken token = _cts.Token;
+
+            _task = Task.Factory.StartNew(() =>
             {
-                _cts = cts;
-                CancellationToken token = _cts.Token;
+                Stopwatch sw = new Stopwatch ();
+                sw.Start();
 
-                _task = Task.Factory.StartNew(() =>
+                while (!token.IsCancellationRequested)
                 {
-                    Stopwatch sw = new Stopwatch ();
-                    sw.Start();
-
-                    while (!token.IsCancellationRequested)
+                    if (sw.Elapsed >= TimeSpan.FromSeconds(1.0 / 540))
                     {
-                        if (sw.Elapsed >= TimeSpan.FromSeconds(1.0 / 540))
-                        {
-                            EmulateCycle();
-                            sw.Restart();
-                        }
-                        Thread.Yield();
+                        EmulateCycle();
+                        sw.Restart();
                     }
-                }, token);
-            }
+                    Thread.Yield();
+                }
+            }, token);
             return _task;
         }
 
@@ -260,9 +257,9 @@ namespace PlayCade.Chip8.Core
                             Registers[(Opcode & 0x0F00) >> 8] -= Registers[(Opcode & 0x00F0) >> 4];
                             Pc += 2;
                             break;
-                        case 0x0006: // 8XY6: Shifts VY right by one and stores the result to VX (VY remains unchanged). VF is set to the value of the least significant bit of VY before the shift.
-                            Registers[0xF] = (byte)(Registers[(Opcode & 0x0F00) >> 8] & 0x1);
-                            Registers[(Opcode & 0x0F00) >> 8] = (Registers[(Opcode & 0x00F0) >> 8] >>= 1);
+                        case 0x0006: // 8XY6: Shifts VY right by one and stores the result to VX (VY remains unchanged). VF is set to the value of the least significant bit of VX before the shift.
+                            Registers[0xF] = (byte)(Registers[(Opcode & 0x00F0) >> 4] & 0x1);
+                            Registers[(Opcode & 0x0F00) >> 8] = (byte)(Registers[(Opcode & 0x00F0) >> 4] >> 1);
                             Pc += 2;
                             break;
                         case 0x0007: // 8XY7: Sets VX to VY minus VX. VF is set to 0 when there's a borrow, and 1 when there isn't.
@@ -278,8 +275,8 @@ namespace PlayCade.Chip8.Core
                             Pc += 2;
                             break;
                         case 0x000E: // 8XYE: Shifts VY left by one and copies the result to VX. VF is set to the value of the most significant bit of VY before the shift.
-                            Registers[0xF] = (byte)(Registers[(Opcode & 0x0F00) >> 8] >> 7);
-                            Registers[(Opcode & 0x0F00) >> 8] = (Registers[(Opcode & 0x00F0) >> 4] <<= 1);
+                            Registers[0xF] = (byte)(Registers[(Opcode & 0x00F0) >> 4] >> 7);
+                            Registers[(Opcode & 0x0F00) >> 8] = (byte)(Registers[(Opcode & 0x00F0) >> 4] << 1);
                             Pc += 2;
                             break;
                     }
@@ -412,15 +409,19 @@ namespace PlayCade.Chip8.Core
                             Pc += 2;
                             break;
                         case 0x0055: // FX55: Stores V0 to VX (including VX) in memory starting at address I. I is increased by 1 for each value written.
-                            for (int i = 0; i <= ((Opcode & 0x0F00) >> 8); i++)
+                            for (int i = 0; i <= (Opcode & 0x0F00) >> 8; i++)
+                            {
                                 Memory[I + i] = Registers[i];
-                            
+                            }
+
                             I += (ushort)(((Opcode & 0x0F00) >> 8) + 1);
                             Pc += 2;
                             break;
-                        case 0x0065: // FX65: Fills V0 to VX (including VX) with values from memory starting at address I. I is increased by 1 for each value written.
-                            for (int i = 0; i <= ((Opcode & 0x0F00) >> 8); ++i)
+                        case 0x0065: // FX65: Fills V0 to VX (including VX) with values from memory starting at address I. I is increased by 1 for each value written.                                                       
+                            for (int i = 0; i <= (Opcode & 0x0F00) >> 8; i++)
+                            {
                                 Registers[i] = Memory[I + i];
+                            }
 
                             I += (ushort)(((Opcode & 0x0F00) >> 8) + 1);
                             Pc += 2;
@@ -434,6 +435,11 @@ namespace PlayCade.Chip8.Core
             }
         }
 
+        public void Reset()
+        {
+            _cts.Cancel();
+            SetDefaults();
+        }
 
     }
 }

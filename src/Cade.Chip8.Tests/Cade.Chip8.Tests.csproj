@@ -4,6 +4,10 @@
         <TargetFramework>net5.0</TargetFramework>
 
         <IsPackable>false</IsPackable>
+
+        <AssemblyName>Cade.Chip8.Tests</AssemblyName>
+
+        <RootNamespace>Cade.Chip8.Tests</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
@@ -20,7 +24,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\PlayCade.Chip8\PlayCade.Chip8.csproj" />
+      <ProjectReference Include="..\Cade.Chip8\Cade.Chip8.csproj" />
     </ItemGroup>
 
 </Project>

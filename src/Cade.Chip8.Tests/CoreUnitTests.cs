@@ -1,10 +1,10 @@
 using System;
 using System.Threading;
-using PlayCade.Chip8.Core;
-using PlayCade.Chip8.Exceptions;
+using Cade.Chip8.Core;
+using Cade.Chip8.Exceptions;
 using Xunit;
 
-namespace PlayCade.Chip8.Tests
+namespace Cade.Chip8.Tests
 {
     public class CoreUnitTests
     {
