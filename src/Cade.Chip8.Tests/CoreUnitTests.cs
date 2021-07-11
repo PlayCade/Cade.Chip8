@@ -1,5 +1,7 @@
 using System;
+using System.Diagnostics;
 using System.Threading;
+using System.Threading.Tasks;
 using Cade.Chip8.Core;
 using Cade.Chip8.Exceptions;
 using Xunit;
@@ -8,6 +10,38 @@ namespace Cade.Chip8.Tests
 {
     public class CoreUnitTests
     {
+        private CoreManager _manager;
+        private bool _fileLoaded = false;
+
+        public CoreUnitTests()
+        {
+            _manager = new CoreManager();
+        }
+        public void Start(CancellationTokenSource cts)
+        {
+            if (!_fileLoaded)
+            {
+                throw new FileNotLoadedException();
+            }
+            
+            CancellationToken token = cts.Token;
+
+            Task.Factory.StartNew(() =>
+            {
+                Stopwatch sw = new Stopwatch ();
+                sw.Start();
+
+                while (!token.IsCancellationRequested)
+                {
+                    if (sw.Elapsed >= TimeSpan.FromSeconds(1.0 / 540))
+                    {
+                        _manager.EmulateCycle();
+                        sw.Restart();
+                    }
+                    Thread.Yield();
+                }
+            }, token);
+        }
         [Fact]
         public void Pc_Default_ReturnsTrue()
         {
@@ -32,7 +66,7 @@ namespace Cade.Chip8.Tests
         {
             var core = new CoreManager();
 
-            Action actual = () => core.Start(new CancellationTokenSource());
+            Action actual = () => Start(new CancellationTokenSource());
             
             Assert.Throws<FileNotLoadedException>(actual);
         }

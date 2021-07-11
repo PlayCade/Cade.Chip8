@@ -11,7 +11,7 @@ namespace Cade.Chip8.Core
         private const ushort MemorySize = 4096;
         private const ushort RegisterSize = 16;
 
-        public byte[]? Keys = new byte[16];
+        public byte[] Keys = new byte[16];
         public readonly byte[] Graphics = new byte[64 * 32];
 
         public byte SoundTimer;
@@ -67,27 +67,27 @@ namespace Cade.Chip8.Core
             Opcode = 0;
             FileLoaded = false;
 
-            for (int i = 0; i < Registers.Length; i++)
+            for (var i = 0; i < Registers.Length; i++)
             {
                 Registers[i] = 0;
             }
 
-            for (int i = 0; i < Memory.Length; i++)
+            for (var i = 0; i < Memory.Length; i++)
             {
                 Memory[i] = 0;
             }
 
-            for (int i = 0; i < Graphics.Length; i++)
+            for (var i = 0; i < Graphics.Length; i++)
             {
                 Graphics[i] = 0;
             }
 
-            for (int i = 0; i < Stack.Length; i++)
+            for (var i = 0; i < Stack.Length; i++)
             {
                 Stack[i] = 0;
             }
 
-            for (int i = 0; i < 80; i++)
+            for (var i = 0; i < 80; i++)
             {
                 Memory[i] = FontSet[i];
             }
@@ -111,34 +111,6 @@ namespace Cade.Chip8.Core
             }
 
             FileLoaded = true;
-        }
-
-        public Task Start(CancellationTokenSource cts)
-        {
-            if (!FileLoaded)
-            {
-                throw new FileNotLoadedException();
-            }
-
-            _cts = cts;
-            CancellationToken token = _cts.Token;
-
-            _task = Task.Factory.StartNew(() =>
-            {
-                Stopwatch sw = new Stopwatch ();
-                sw.Start();
-
-                while (!token.IsCancellationRequested)
-                {
-                    if (sw.Elapsed >= TimeSpan.FromSeconds(1.0 / 540))
-                    {
-                        EmulateCycle();
-                        sw.Restart();
-                    }
-                    Thread.Yield();
-                }
-            }, token);
-            return _task;
         }
 
         public void EmulateCycle()
@@ -311,16 +283,16 @@ namespace Cade.Chip8.Core
                     ushort pixel;
 
                     Registers[0xF] = 0;
-                    for (int yline = 0; yline < height; yline++)
+                    for (int yLine = 0; yLine < height; yLine++)
                     {
-                        pixel = Memory[I + yline];
-                        for (int xline = 0; xline < 8; xline++)
+                        pixel = Memory[I + yLine];
+                        for (int xLine = 0; xLine < 8; xLine++)
                         {
-                            if ((pixel & (0x80 >> xline)) != 0)
+                            if ((pixel & (0x80 >> xLine)) != 0)
                             {
-                                if (Graphics[(x + xline + ((y + yline) * 64))] == 1)
+                                if (Graphics[x + xLine + (y + yLine) * 64] == 1)
                                     Registers[0xF] = 1;
-                                Graphics[x + xline + ((y + yline) * 64)] ^= 1;
+                                Graphics[x + xLine + (y + yLine) * 64] ^= 1;
                             }
                         }
                     }
@@ -365,12 +337,10 @@ namespace Cade.Chip8.Core
 
                             for (int i = 0; i < Keys.Length; i++)
                             {
-                                if(Keys[i] != 0)
-                                {
-                                    Registers[(Opcode & 0x0F00) >> 8] = (byte)i;
-                                    keyPressed = true;
-                                    break;
-                                }
+                                if (Keys[i] == 0) continue;
+                                Registers[(Opcode & 0x0F00) >> 8] = (byte)i;
+                                keyPressed = true;
+                                break;
                             }
                             if (!keyPressed)
                             {
@@ -431,7 +401,6 @@ namespace Cade.Chip8.Core
                 default:
                     Console.WriteLine("Unimplemented OpCode");
                     throw new NotImplementedException();
-                    break;
             }
         }
 

@@ -61,8 +61,8 @@ namespace Cade.Chip8
                         }
 
                         if (Core.SoundTimer > 0)
-                        {
-                            Console.WriteLine("Beep");
+                        { 
+                            //TODO: Add audio output
                             Core.SoundTimer--;
                         }
 
